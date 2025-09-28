@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>133 프로젝트 · 메인 v1.3.1</title>
+  <title>133 프로젝트 · 메인 v1.3.4 (aspect sync)</title>
   <link rel="stylesheet" href="./css/styles.css"/>
 </head>
 <body class="mode-default">
+  <div id="debugRibbon">v1.3.4 · JS OK · <span id="loc"></span> · <span id="dbg"></span></div>
+
   <header class="topbar">
     <div class="brand"><strong>BET33 비공식 파트너</strong></div>
     <nav class="nav">
@@ -21,9 +23,9 @@
 
   <main id="page" class="page">
     <section class="grid">
-      <aside class="rail left-rail"><div class="rail-inner"><h3>LNB</h3><p>좌측 보조 영역</p></div></aside>
+      <aside class="rail left-rail"><div class="rail-inner"><h3>LNB</h3></div></aside>
       <section class="center">
-        <div class="monitor" id="monitor">
+        <div class="monitor" id="monitor" tabindex="0">
           <div class="split-line"></div>
           <div class="screen screen-A" id="screenA"><div class="placeholder">A 영역</div></div>
           <div class="screen screen-B" id="screenB"><div class="placeholder">B 영역</div>
@@ -37,8 +39,6 @@
               <button class="ctrl down" title="아래"></button>
             </div>
           </div>
-
-          <!-- Inline: 프로모션참여 (중분류/하위분류) -->
           <div class="join-inline" id="joinInline" hidden>
             <div class="join-bars">
               <button class="bar mid is-static" id="joinMid">프로모션참여 카테고리</button>
