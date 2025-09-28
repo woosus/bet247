@@ -1,8 +1,84 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"/>
-<title>133 프로젝트 · 메인 v1.3</title><link rel="stylesheet" href="./css/styles.css"></head>
-<body><main class="page"><section class="grid"><section class="center">
-<div class="monitor" id="monitor">
-<div class="split-line"></div>
-<div class="screen screen-A" id="screenA"><div class="placeholder">A 영역</div></div>
-<div class="screen screen-B" id="screenB"><div class="placeholder">B 영역</div></div>
-</div></section></section></main><script src="./js/app.js"></script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>133 프로젝트 · 메인 v1.3.1</title>
+  <link rel="stylesheet" href="./css/styles.css"/>
+</head>
+<body class="mode-default">
+  <header class="topbar">
+    <div class="brand"><strong>BET33 비공식 파트너</strong></div>
+    <nav class="nav">
+      <button data-view="promotion" class="nav-btn">프로모션</button>
+      <button data-view="coupon" class="nav-btn">쿠폰신청</button>
+      <button data-view="promo-join" class="nav-btn">프로모션참여</button>
+      <button data-view="contact" class="nav-btn">문의</button>
+      <button data-view="emergency" class="nav-btn">긴급쿠폰신청</button>
+      <button data-view="signup" class="nav-btn">가입하기</button>
+    </nav>
+  </header>
+
+  <main id="page" class="page">
+    <section class="grid">
+      <aside class="rail left-rail"><div class="rail-inner"><h3>LNB</h3><p>좌측 보조 영역</p></div></aside>
+      <section class="center">
+        <div class="monitor" id="monitor">
+          <div class="split-line"></div>
+          <div class="screen screen-A" id="screenA"><div class="placeholder">A 영역</div></div>
+          <div class="screen screen-B" id="screenB"><div class="placeholder">B 영역</div>
+            <div class="control-dock" id="controlDock" aria-label="프로모션 제어">
+              <button class="ctrl up" title="위"></button>
+              <div class="row">
+                <button class="ctrl left" title="이전"></button>
+                <button class="ctrl play" title="재생/멈춤">■</button>
+                <button class="ctrl right" title="다음"></button>
+              </div>
+              <button class="ctrl down" title="아래"></button>
+            </div>
+          </div>
+
+          <!-- Inline: 프로모션참여 (중분류/하위분류) -->
+          <div class="join-inline" id="joinInline" hidden>
+            <div class="join-bars">
+              <button class="bar mid is-static" id="joinMid">프로모션참여 카테고리</button>
+              <div class="sub-wrap" id="joinSubWrap" aria-label="하위분류">
+                <button class="bar sub" data-sub="j1">30% 즉시보너스 신청</button>
+                <button class="bar sub" data-sub="j2">프리스핀 100%보너스참여</button>
+                <button class="bar sub" data-sub="j3">프리스핀 100%보너스당첨</button>
+                <button class="bar sub" data-sub="j4">300배이상보너스당첨</button>
+              </div>
+            </div>
+            <div class="join-detail" id="joinDetail"></div>
+          </div>
+        </div>
+
+        <form class="coupon-form" id="couponForm" autocomplete="off" hidden>
+          <label>ID: <input name="userId" placeholder="아이디"/></label>
+          <label>24시간내 이용횟수: <input name="useCount" type="number" min="0" step="1" placeholder="0"/></label>
+          <button type="submit">확인</button>
+        </form>
+      </section>
+      <aside class="rail right-rail"><div class="rail-inner"><h3>Quick</h3></div></aside>
+    </section>
+  </main>
+
+  <dialog id="promoModal" class="modal">
+    <div class="modal-body">
+      <button class="close" data-close>×</button>
+      <div class="promo-wrap"><div class="promo-A" id="promoA"></div><div class="promo-B" id="promoB"></div></div>
+    </div>
+  </dialog>
+
+  <dialog id="contactModal" class="modal">
+    <div class="modal-body"><button class="close" data-close>×</button><h3>문의</h3></div>
+  </dialog>
+
+  <dialog id="signupModal" class="modal">
+    <div class="modal-body"><button class="close" data-close>×</button><h3>가입</h3></div>
+  </dialog>
+
+  <div id="bgVideoHolder" class="bg-video" hidden></div>
+  <script src="./js/app.js"></script>
+</body>
+</html>
