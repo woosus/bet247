@@ -1,0 +1,55 @@
+
+:root{
+  --side: 25px;
+  --bar-bg: linear-gradient(180deg,#C91D1D,#A71111);
+  --bar-radius: 14px;
+  --bar-border: 3px;
+  --neon-speed: 6s;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,AppleSDGothicNeo,"Noto Sans KR",sans-serif;background:#f9fafb;color:#0b0b0b}
+.top{padding:8px var(--side);}
+.page{max-width:1200px;margin:0 auto;padding:0 var(--side) 40px}
+
+.monitor{display:grid;place-items:center;margin:16px 0 18px}
+.monitor-inner{width:min(920px,95vw);aspect-ratio:16/9;background:#000;border-radius:18px;overflow:hidden;position:relative;box-shadow:0 12px 28px rgba(0,0,0,.25)}
+.monitor-video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.fallback{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#fff;background:#000a;backdrop-filter:blur(2px);gap:10px}
+.hidden{display:none}
+
+.btnbar{
+  display:flex;gap:18px;
+  justify-content:center;align-items:center;
+  padding:12px 18px;
+  background:var(--bar-bg);
+  border-radius:var(--bar-radius);
+  border:var(--bar-border) solid #8C0E0E;
+  width:min(680px,92vw);
+  margin:0 auto;
+  position:relative;
+}
+.neon{
+  box-shadow:0 0 8px rgba(255,0,0,.35),0 0 18px rgba(255,75,75,.25);
+  animation:neonPulse var(--neon-speed) ease-in-out infinite;
+}
+@keyframes neonPulse{
+  0%,100%{ box-shadow:0 0 10px rgba(255,0,0,.30),0 0 22px rgba(255,80,80,.22); }
+  50%{ box-shadow:0 0 20px rgba(255,0,0,.55),0 0 38px rgba(255,120,120,.40); }
+}
+
+.tri-btn{
+  position:relative;
+  width:110px;height:52px;
+  background:linear-gradient(180deg,#F44,#C11);
+  border:2px solid #8D0E0E;
+  border-radius:12px;
+  display:grid;place-items:center;
+  cursor:pointer;
+  transition:filter .18s ease, transform .18s ease, box-shadow .18s ease;
+  box-shadow:inset 0 -6px 10px rgba(0,0,0,.25),0 2px 8px rgba(0,0,0,.18);
+}
+.tri-btn:focus-visible{outline:3px solid #fff4;outline-offset:3px}
+.tri-btn:active,.tri-btn.is-active{filter:brightness(1.25) saturate(1.05);transform:translateY(1px)}
+.tri{width:34px;height:34px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.label{position:absolute;bottom:6px;right:8px;font-weight:800;font-size:14px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.hint{opacity:.65;text-align:center;margin-top:10px;font-size:13px}
