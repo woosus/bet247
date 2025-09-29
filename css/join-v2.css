@@ -1,0 +1,31 @@
+
+/* join-v2.css — 가입/설문 + LNB 효과(프로모션참여 하위 버튼) */
+.signup-modal .body{background:#0b1117;color:#eaf2ff}
+.signup-steps{display:grid;gap:12px}
+.panel{border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.04);padding:12px}
+.panel h4{margin:0 0 8px 0}
+.panel .hint{opacity:.8;font-size:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.input{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#eaf2ff}
+.btnp{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;background:#ffd400;color:#111;font-weight:800}
+.btns{display:flex;gap:8px;justify-content:flex-end}
+.note{font-size:12px;opacity:.8}
+.okmsg{padding:10px;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(0,255,120,.1)}
+
+.question{border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:12px;background:rgba(0,0,0,.25);color:#eaf2ff}
+.question h5{margin:0 0 8px 0}
+.choices{display:grid;gap:8px;margin-top:6px}
+.choices label{display:flex;gap:8px;align-items:flex-start}
+.nextwrap{margin-top:10px;display:flex;justify-content:flex-end}
+
+/* ===== LNB 효과: 프로모션참여 하위 버튼들 ===== */
+.join-sub{display:grid;gap:8px}
+.join-sub .item{position:relative;display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border-radius:.6rem;
+  background:rgba(255,255,255,.06);color:#eaf2ff;cursor:pointer;transition:transform .18s ease, background-color .18s ease, color .18s ease;}
+.join-sub .item:hover{transform:translateX(4px);background:rgba(255,255,255,.08)}
+.join-sub .item::before{content:"";width:2px;height:0;background:#ffd200;border-radius:2px;position:absolute;left:0;top:0;transition:height .2s ease;}
+.join-sub .item.is-active{color:#fff;font-weight:700;background:rgba(255,255,255,.10)}
+.join-sub .item.is-active::before{height:100%}
+/* 아코디언 */
+.join-sub-wrap{max-height:0;opacity:0;overflow:hidden;transition:max-height .26s ease,opacity .26s ease;}
+.join-sub-wrap.is-open{max-height:600px;opacity:1}

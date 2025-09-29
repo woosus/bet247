@@ -1,7 +1,15 @@
-# BET33 PPT EXACT v2
-- PPT 요구사항 기반 레이아웃/동작 반영
-- 중앙 모니터 A/B 분할 + 선호도 표시
-- B 하단 Dock: 4방향 삼각형 나열 / 작은 버튼 모드 스위치
-- 프로모션 슬라이더: A(p1~p3), B(p1-1~p3-1)
-- 쿠폰신청/긴급쿠폰신청: 0.2초 주기로 모니터 ↔ 전체배경 지그재그 재생(노크롭)
-- 영상 파일 위치: /assets/ (쿠폰신청.mp4 / coupon.mp4 / 긴급쿠폰신청.mp4 / emergency.mp4 / ddd1.mp4 중 존재하는 것 자동 탐색)
+
+# PPT-EXACT Upgrade v2
+- 가입하기: 3단계 위저드 + "쿠폰받기" 클릭 시 중앙 모니터 A/B에 문항을 **한 문제씩 교차** 표출.
+  - 1번은 A, 2번은 B, 3번은 A…
+  - 각 문항은 **체크박스**로 응답(1개 이상 필수), 다음 클릭 시 다음 문항으로 진행.
+  - 응답은 `localStorage.bet33_survey`에 저장(데모).
+  - 모든 문항 완료 시 완료 문구 출력 후 "접수되었습니다" 화면.
+- 프로모션참여: 중분류 클릭 시 하위 버튼에 **LNB 효과**(slide-in-left / active-indicator / accordion) 적용.
+
+## 적용 방법
+1) `css/join-v2.css` → `/css/`
+2) `js/join-v2.js` → `/js/`
+3) `index.html`의 `</body>` 바로 위에 추가:
+<link rel="stylesheet" href="./css/join-v2.css">
+<script src="./js/join-v2.js"></script>
