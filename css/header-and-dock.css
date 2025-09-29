@@ -1,0 +1,42 @@
+
+/* ===== Header order doesn't need CSS; done via JS ===== */
+
+/* ===== Banner Dock (red bar) ===== */
+#bannerDock{
+  position: relative;
+  margin: 10px auto 0 auto;
+  width: clamp(220px, 40%, 420px);
+  height: 42px;
+  background: #e01919;
+  background-image: linear-gradient(180deg, #ff3b3b, #b50f0f);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.22), inset 0 2px 0 rgba(255,255,255,.25);
+  display: none; /* initially hidden until mounted */
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 12px;
+}
+#bannerDock.show{ display: flex; }
+
+.tri{
+  width: 36px; height: 28px; position: relative;
+  background: linear-gradient(180deg, #2bbcff, #1160d3);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+  border-radius: 6px; /* for subtle anti-alias clip-path */
+}
+.tri.up{    clip-path: polygon(50% 0, 0 100%, 100% 100%); }
+.tri.down{  clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.tri.left{  clip-path: polygon(0 50%, 100% 0, 100% 100%); }
+.tri.right{ clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.tri:hover{ transform: translateY(-1px) scale(1.03); }
+.tri:active{ transform: translateY(0) scale(.98); filter: brightness(.95); }
+
+/* Focus effect on monitor when A/B is chosen */
+#monitor.focusA{ outline: 2px solid rgba(43,188,255,.65); outline-offset: 3px; }
+#monitor.focusB{ outline: 2px solid rgba(255,180,0,.65); outline-offset: 3px; }
+
+/* Ensure A/B containers behave like banners */
+#screenA img, #layerA img, #screenB img, #layerB img{
+  width: 100%; height: 100%; object-fit: contain; display: block;
+}

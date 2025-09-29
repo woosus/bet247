@@ -1,15 +1,13 @@
 
-# PPT-EXACT Upgrade v2
-- 가입하기: 3단계 위저드 + "쿠폰받기" 클릭 시 중앙 모니터 A/B에 문항을 **한 문제씩 교차** 표출.
-  - 1번은 A, 2번은 B, 3번은 A…
-  - 각 문항은 **체크박스**로 응답(1개 이상 필수), 다음 클릭 시 다음 문항으로 진행.
-  - 응답은 `localStorage.bet33_survey`에 저장(데모).
-  - 모든 문항 완료 시 완료 문구 출력 후 "접수되었습니다" 화면.
-- 프로모션참여: 중분류 클릭 시 하위 버튼에 **LNB 효과**(slide-in-left / active-indicator / accordion) 적용.
+# Header & Banner Dock v1
+- 헤더 순서 재배치: 프로모션 · 쿠폰신청 · 프로모션참여 · 긴급쿠폰신청 · 문의 · 가입
+- 중앙 모니터 상/하에 A/B 배너 표시 (A: p1~p3, B: p1-1~p3-1)
+- 모니터 아래 빨간 Dock(▲ ▼ ◀ ▶): 위/아래 = A/B 포커스, 좌/우 = 이전/다음
+- 쿠폰/긴급 영상 페이지에서는 Dock 자동 숨김
 
 ## 적용 방법
-1) `css/join-v2.css` → `/css/`
-2) `js/join-v2.js` → `/js/`
-3) `index.html`의 `</body>` 바로 위에 추가:
-<link rel="stylesheet" href="./css/join-v2.css">
-<script src="./js/join-v2.js"></script>
+1) `css/header-and-dock.css` → `/css/`
+2) `js/header-and-dock.js` → `/js/`
+3) `index.html`의 `</body>` 직전에 추가:
+<link rel="stylesheet" href="./css/header-and-dock.css">
+<script src="./js/header-and-dock.js"></script>
