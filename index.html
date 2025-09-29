@@ -3,68 +3,98 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>133 프로젝트 · 메인 v1.3.5</title>
+  <title>BET33 파트너 · PPT EXACT v2</title>
   <link rel="stylesheet" href="./css/styles.css"/>
 </head>
-<body class="mode-default">
-  <div id="debugRibbon">v1.3.5 · JS OK · <span id="loc"></span> · <span id="dbg"></span></div>
-
+<body>
+  <div id="ribbon">v2 · PPT-EXACT · <span id="dbg"></span></div>
   <header class="topbar">
-    <div class="brand"><strong>BET33 비공식 파트너</strong></div>
+    <img class="logo" src="./assets/logo.png" alt="BET33"/>
     <nav class="nav">
-      <button data-view="promotion" class="nav-btn">프로모션</button>
-      <button data-view="coupon" class="nav-btn">쿠폰신청</button>
-      <button data-view="promo-join" class="nav-btn">프로모션참여</button>
-      <button data-view="contact" class="nav-btn">문의</button>
-      <button data-view="emergency" class="nav-btn">긴급쿠폰신청</button>
-      <button data-view="signup" class="nav-btn">가입하기</button>
+      <button class="btn" data-act="promo">프로모션</button>
+      <button class="btn" data-act="coupon">쿠폰신청</button>
+      <button class="btn" data-act="emergency">긴급쿠폰신청</button>
+      <button class="btn" data-act="join">프로모션참여</button>
+      <button class="btn" data-act="signup">가입하기</button>
     </nav>
   </header>
 
-  <main id="page" class="page">
-    <section class="grid">
-      <aside class="rail left-rail"><div class="rail-inner"><h3>LNB</h3></div></aside>
-      <section class="center">
-        <div class="monitor" id="monitor" tabindex="0">
-          <div class="split-line"></div>
-          <div class="screen screen-A" id="screenA"><div class="placeholder">A 영역</div></div>
-          <div class="screen screen-B" id="screenB"><div class="placeholder">B 영역</div>
-            <div class="control-dock" id="controlDock" aria-label="프로모션 제어">
-              <button class="ctrl up" title="위"></button>
-              <div class="row">
-                <button class="ctrl left" title="이전"></button>
-                <button class="ctrl play" title="재생/멈춤">■</button>
-                <button class="ctrl right" title="다음"></button>
-              </div>
-              <button class="ctrl down" title="아래"></button>
-            </div>
-          </div>
+  <main class="grid">
+    <aside class="rail"><h3>LNB</h3></aside>
+
+    <section class="center">
+      <div id="monitor" class="monitor">
+        <div class="split-line"></div>
+        <div class="layer a" id="layerA"><div class="cap">A 영역</div></div>
+        <div class="layer b" id="layerB"><div class="cap">B 영역</div></div>
+
+        <div class="pref" id="prefBox">
+          <div>A 선호도: <b id="prefA">—</b></div>
+          <div>B 선호도: <b id="prefB">—</b></div>
         </div>
 
-        <form class="coupon-form" id="couponForm" autocomplete="off" hidden>
-          <label>ID: <input name="userId" placeholder="아이디"/></label>
-          <label>24시간내 이용횟수: <input name="useCount" type="number" min="0" step="1" placeholder="0"/></label>
-          <button type="submit">확인</button>
-        </form>
-      </section>
-      <aside class="rail right-rail"><div class="rail-inner"><h3>Quick</h3></div></aside>
+        <div class="dock" id="dock">
+          <div class="row top"><button class="tri up" title="위"></button></div>
+          <div class="row mid">
+            <button class="tri left" title="왼쪽"></button>
+            <button class="tri play" title="재생/정지">■</button>
+            <button class="tri right" title="오른쪽"></button>
+          </div>
+          <div class="row bot"><button class="tri down" title="아래"></button></div>
+        </div>
+
+        <div class="mode" id="modeSwitch">
+          <label><input type="radio" name="dock" value="stack" checked/> 4방향 삼각형 나열</label>
+          <label><input type="radio" name="dock" value="compact"/> 좌/우/위/아래 모아 작은 버튼</label>
+        </div>
+      </div>
+
+      <form id="idForm" class="form">
+        <label>ID <input id="uid" placeholder="아이디"/></label>
+        <label>24시간내 이용횟수 <input id="ucnt" type="number" min="0" step="1" value="0"/></label>
+        <button>확인</button>
+      </form>
     </section>
+
+    <aside class="rail"><h3>Quick</h3>
+      <ul>
+        <li><a href="#">비공식 파트너 쿠폰 서비스</a></li>
+        <li><a href="#">텔레그램 문의</a></li>
+        <li><a href="#">카카오톡 문의</a></li>
+      </ul>
+    </aside>
   </main>
 
+  <!-- 모달: 프로모션 -->
   <dialog id="promoModal" class="modal">
-    <div class="modal-body">
+    <div class="body">
       <button class="close" data-close>×</button>
-      <div class="promo-wrap"><div class="promo-A" id="promoA"></div><div class="promo-B" id="promoB"></div></div>
+      <div class="wrap">
+        <div id="promoA" class="promo"></div>
+        <div id="promoB" class="promo"></div>
+      </div>
     </div>
   </dialog>
 
-  <dialog id="contactModal" class="modal">
-    <div class="modal-body"><button class="close" data-close>×</button><h3>문의</h3></div>
+  <!-- 프로모션참여 (중/하위 카테고리 4개) -->
+  <dialog id="joinModal" class="modal">
+    <div class="body">
+      <button class="close" data-close>×</button>
+      <div class="bars">
+        <button class="bar mid" id="midBar">프로모션참여 카테고리</button>
+        <div id="subBars" class="subs">
+          <button class="bar sub" data-key="j1">30% 즉시보너스 신청</button>
+          <button class="bar sub" data-key="j2">프리스핀 100%보너스참여</button>
+          <button class="bar sub" data-key="j3">프리스핀 100%보너스당첨</button>
+          <button class="bar sub" data-key="j4">300배이상 보너스당첨</button>
+        </div>
+      </div>
+      <div id="joinDetail" class="detail">좌측에서 선택하세요.</div>
+    </div>
   </dialog>
 
-  <dialog id="signupModal" class="modal">
-    <div class="modal-body"><button class="close" data-close>×</button><h3>가입</h3></div>
-  </dialog>
+  <!-- 전체화면 비디오 오버레이 -->
+  <div id="overlay" class="overlay" hidden></div>
 
   <script src="./js/app.js"></script>
 </body>
