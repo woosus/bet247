@@ -2,407 +2,117 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>백산삼 팀장 </title>
-<style>
-:root{--max:1200px;--neon:#45f3ff}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#000;color:#eaf2ff;font-family:system-ui,Segoe UI,Roboto,Noto Sans KR,Arial,sans-serif}
-a{text-decoration:none;color:inherit}
-
-/* 헤더(로고만) */
-.header{position:sticky;top:0;z-index:20;background:linear-gradient(#171325,#0f0b1f);border-bottom:1px solid #2b2541}
-.header__row{max-width:var(--max);margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
-.header img{height:64px;filter: drop-shadow(0 2px 6px rgba(0,0,0,.45))}
-.header .title{font-weight:900}
-.header .title b{font-size:28px;color:#ffe36f}
-.header .title span{display:block;font-size:18px;color:#74c6ff}
-
-/* 무대 */
-.wrap{max-width:var(--max);margin:28px auto 80px;padding:0 16px}
-
-/* 모니터(요청대로 70% 비율) */
-.monitor{
-  width:min(70vw,var(--max));
-  max-width:980px;
-  aspect-ratio:16/9;
-  border-radius:14px;
-  overflow:hidden;
-  border:2px solid rgba(255,255,255,.7);
-  box-shadow:0 10px 30px rgba(0,0,0,.5);
-  background:#121418;
-  margin:0 auto;
-  position:relative;
-  transform-origin:center center;
-  transition: transform .55s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
-}
-.monitor video,.monitor img{width:100%;height:100%;object-fit:cover;display:block}
-.monitor--off::after{content:"";position:absolute;inset:0;background:#000}
-
-/* 프로모션 시 확대(고정 중앙 배치 + 스케일) */
-.monitor.zoom {
-  position:fixed;
-  left:50%; top:50%;
-  z-index:1200;
-  /* translate로 중앙 고정한 후 scale은 JS에서 --zoom에 주입 */
-  transform: translate(-50%, -50%) scale(var(--zoom,1));
-  box-shadow:0 30px 120px rgba(0,0,0,.75), 0 0 32px rgba(69,243,255,.25);
-  border-color: rgba(255,255,255,.9);
-}
-body.zoom-lock { overflow:hidden; }
-
-/* 배경 교차용 */
-.bg{position:fixed;inset:0;z-index:-1;background:#000}
-.bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .2s}
-.bg.on video{opacity:1}
-
-/* 6개 버튼 (금속 + 네온테두리 반응) */
-.actions{width:min(70vw,var(--max));max-width:980px;margin:14px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.btn{position:relative;border:none;border-radius:14px;padding:16px 14px;font-weight:900;font-size:18px;letter-spacing:.3px;color:#eaf6ff;background:linear-gradient(145deg,#2a3b4a,#0e1a24 55%,#122a3c);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 18px rgba(0,0,0,.45);cursor:pointer;transition:transform .08s,filter .08s}
-.btn:hover{transform:translateY(-1px)}
-.btn:active{transform:translateY(0);filter:brightness(.9)}
-.btn.trans{background:rgba(20,30,45,.55)}
-.btn.neon{outline:2px solid rgba(69,243,255,.55);box-shadow:0 0 10px var(--neon),0 0 30px rgba(69,243,255,.35),inset 0 0 15px rgba(69,243,255,.12)}
-
-/* 하단 6개 카드 */
-.cards{width:min(70vw,var(--max));max-width:980px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px auto 0}
-.card{padding:14px;border-radius:12px;background:linear-gradient(180deg,#141a22,#0e141b);border:1px solid #1f2a38;color:#cfe4ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-.card h4{margin:0 0 6px 0;font-size:15px}
-.card p{margin:0;font-size:13px;opacity:.8}
-
-/* 프로모션 오버레이(전원 꺼짐/들어옴) */
-.promo{position:absolute;inset:0;display:none;place-items:center;background:#000}
-.promo.on{display:grid}
-.promo img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 12px 30px rgba(0,0,0,.7))}
-.promo.off{animation:off .35s ease forwards}
-.promo.onfx{animation:on .35s ease forwards}
-@keyframes off{0%{transform:scaleY(1);opacity:1}90%{transform:scaleY(.02);opacity:.7;filter:brightness(2)}100%{transform:scaleY(0);opacity:0}}
-@keyframes on{0%{transform:scaleY(0);opacity:0}20%{transform:scaleY(.02);opacity:.8;filter:brightness(2)}100%{transform:scaleY(1);opacity:1}}
-
-/* 모달(가입/설문) */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;place-items:center;z-index:30}
-.modal.on{display:grid}
-.sheet{width:min(720px,92vw);background:#0e1320;border:1px solid #24304a;border-radius:16px;padding:18px 16px;color:#dfe9ff}
-.sheet h3{margin:0 0 12px}
-.row{display:grid;grid-template-columns:120px 1fr;gap:10px;margin:10px 0}
-input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #31445f;background:#0b1220;color:#e6f0ff}
-.bar{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
-.small{font-size:12px;opacity:.75}
-
-/* Support Modal */
-.support-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:2000; backdrop-filter: blur(2px);}
-.support-backdrop.show{ display:flex; }
-.support-card{width:min(520px, 92vw); background: #0d1420; border:1px solid rgba(255,255,255,.12); border-radius:18px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 16px rgba(0,180,255,.25); padding:22px 20px; color:#eaf2ff; animation: pop .18s ease-out;}
-@keyframes pop{ from{ transform:scale(.96); opacity:.2 } to{ transform:scale(1); opacity:1 } }
-.support-card h3{margin:0 0 6px; font-size:20px; letter-spacing:.3px}
-.support-card p{ margin:8px 0 0; opacity:.9 }
-.support-list{ margin:14px 0 14px; display:grid; gap:10px }
-.support-row{ display:flex; align-items:center; justify-content:space-between; background:linear-gradient(180deg,#111a2a,#0b111d); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px 14px; }
-.support-row strong{ font-size:18px; letter-spacing:.4px }
-.support-row code{ font-size:18px }
-.support-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px }
-.btn-ghost, .btn-primary{ padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer; border:none }
-.btn-ghost{ background:#1a2435; color:#dbe8ff; }
-.btn-ghost:hover{ background:#23304a }
-.btn-primary{ color:#081018; background:linear-gradient(135deg,#6ee7ff,#59b7ff 40%,#41e1a7); box-shadow:0 0 16px rgba(92,199,255,.45), inset 0 0 0 2px rgba(255,255,255,.15); }
-.btn-primary:hover{ filter:brightness(1.08) }
-.neon{ box-shadow:0 0 0 2px rgba(0,212,255,.25), 0 0 18px rgba(0,212,255,.35), inset 0 0 0 1px rgba(255,255,255,.08); border-radius:14px; }
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>BET33 파트너 · PPT EXACT v2</title>
+  <link rel="stylesheet" href="./css/styles.css"/>
 </head>
 <body>
+  <div id="ribbon">v2 · PPT-EXACT · <span id="dbg"></span></div>
+  <header class="topbar">
+    <img class="logo" src="./assets/logo.png" alt="BET33"/>
+    <nav class="nav">
+  <button class="btn" data-act="promo"      data-view="promotion">프로모션</button>
+  <button class="btn" data-act="coupon"     data-view="coupon">쿠폰신청</button>
+  <button class="btn" data-act="promo-join" data-view="promo-join">프로모션참여</button>
+  <button class="btn" data-act="emergency"  data-view="emergency">긴급쿠폰신청</button>
+  <button class="btn" data-act="contact"    data-view="contact">문의</button>
+  <button class="btn" data-act="signup"     data-view="signup">가입하기</button>
+</nav>
 
-<!-- 배경(초기 비활성) -->
-<div class="bg" id="bg"><video id="bgVid" muted playsinline></video></div>
+    </nav>
+  </header>
 
-<header class="header">
-  <div class="header__row">
-    <img src="assets/logo.png" alt="BET33"/>
-    <div class="title"><b>BET33</b><span>비공식 파트너</span></div>
-  </div>
-</header>
+  <main class="grid">
+    <aside class="rail"><h3>LNB</h3></aside>
 
-<main class="wrap">
-  <!-- 중앙 모니터 -->
-  <div class="monitor" id="monitor">
-    <video id="centerVid" autoplay muted loop playsinline poster="assets/center-poster.jpg">
-      <!-- 영문 / 한글 파일명 모두 지원 -->
-      <source src="assets/center.mp4" type="video/mp4"/>
-      <source src="assets/센터.mp4" type="video/mp4"/>
-    </video>
-    <div class="promo" id="promo">
-      <img id="promoImg" src="assets/PRO1.png" alt="프로모션">
+    <section class="center">
+      <div id="monitor" class="monitor">
+        <div class="split-line"></div>
+        <div class="layer a" id="layerA"><div class="cap">A 영역</div></div>
+        <div class="layer b" id="layerB"><div class="cap">B 영역</div></div>
+
+        <div id="prefBox" class="pref yellow-ui">…</div>
+          <div>A 선호도: <b id="prefA">—</b></div>
+          <div>B 선호도: <b id="prefB">—</b></div>
+        </div>
+
+        <div class="dock" id="dock">
+          <div class="row top"><button class="tri up" title="위"></button></div>
+          <div class="row mid">
+            <button class="tri left" title="왼쪽"></button>
+            <button class="tri play" title="재생/정지">■</button>
+            <button class="tri right" title="오른쪽"></button>
+          </div>
+          <div class="row bot"><button class="tri down" title="아래"></button></div>
+        </div>
+
+        <div class="mode" id="modeSwitch">
+          <label><input type="radio" name="dock" value="stack" checked/> 4방향 삼각형 나열</label>
+          <label><input type="radio" name="dock" value="compact"/> 좌/우/위/아래 모아 작은 버튼</label>
+        </div>
+      </div>
+
+      <form id="couponForm" class="form">
+        <label>ID <input id="uid" placeholder="아이디"/></label>
+        <label>24시간내 이용횟수 <input id="ucnt" type="number" min="0" step="1" value="0"/></label>
+        <button>확인</button>
+      </form>
+    </section>
+
+    <aside class="rail"><h3>Quick</h3>
+      <ul>
+        <li><a href="#">비공식 파트너 쿠폰 서비스</a></li>
+        <li><a href="#">텔레그램 문의</a></li>
+        <li><a href="#">카카오톡 문의</a></li>
+      </ul>
+    </aside>
+  </main>
+
+  <!-- 모달: 프로모션 -->
+  <dialog id="promoModal" class="modal">
+    <div class="body">
+      <button class="close" data-close>×</button>
+      <div class="wrap">
+        <div id="promoA" class="promo"></div>
+        <div id="promoB" class="promo"></div>
+      </div>
     </div>
-  </div>
+  </dialog>
 
-  <!-- 6개 버튼 -->
-  <div class="actions" id="actions">
-    <button class="btn" id="bJoin">가입하기</button>
-    <button class="btn" id="bCoupon">쿠폰 신청하기</button>
-    <button class="btn" id="bPromo">프로모션</button>
-    <button class="btn" id="bParticipate">참여</button>
-    <button class="btn" id="bEmergency">긴급쿠폰 신청</button>
-    <button class="btn js-support" id="bContact">문의</button>
-  </div>
-
-  <!-- 하단 카드 6개 -->
-  <div class="cards">
-    <div class="card"><h4>첫충전 보너스</h4><p>첫 입금 이용자를 위한 기본 혜택.</p></div>
-    <div class="card"><h4>재입금 리워드</h4><p>지속 이용자를 위한 리텐션 설계.</p></div>
-    <div class="card"><h4>페이백/최대출금</h4><p>규정은 사전 고지 기준으로 안내.</p></div>
-    <div class="card"><h4>비공식 파트너 프로그램</h4><p>선호도 맞춤 큐레이션.</p></div>
-    <div class="card"><h4>투명한 가이드</h4><p>핵심만 간결하게 제공.</p></div>
-    <div class="card"><h4>빠른 문의</h4><p>이메일/메신저 채널 운영.</p></div>
-  </div>
-</main>
-
-<!-- 가입/설문 모달 -->
-<div class="modal" id="mJoin"><div class="sheet">
-  <h3>회원가입 (빠른 등록)</h3>
-  <div class="row"><label>아이디</label><input placeholder="영문/숫자"/></div>
-  <div class="row"><label>비밀번호</label><input type="password" placeholder="8자 이상"/></div>
-  <div class="row"><label>성함</label><input placeholder="홍길동"/></div>
-  <div class="row"><label>연락처</label><input placeholder="010-0000-0000"/></div>
-  <div class="bar"><button class="btn trans" id="xJoin">닫기</button><button class="btn neon" id="goSurvey">다음(선호도)</button></div>
-  <div class="small">※ 실제 처리는 운영 채널을 통해 안내됩니다.</div>
-</div></div>
-
-<div class="modal" id="mSurvey"><div class="sheet">
-  <h3>선호도 체크</h3>
-  <div class="row"><label>주 이용</label><select><option>슬롯</option><option>카지노</option><option>스포츠</option></select></div>
-  <div class="row"><label>이용 빈도</label><select><option>2~3회/주</option><option>4~6회/주</option><option>매일</option></select></div>
-  <div class="row"><label>1회 충전액</label><select><option>5~10만원</option><option>10~20만원</option><option>20만원+</option></select></div>
-  <div class="row" style="grid-template-columns:1fr"><textarea rows="4" placeholder="메모(선택)"></textarea></div>
-  <div class="bar"><button class="btn trans" id="backJoin">이전</button><button class="btn neon" id="okSubmit">제출</button></div>
-</div></div>
-
-<!-- Support Modal -->
-<div id="supportModal" class="support-backdrop" aria-hidden="true">
-  <div class="support-card neon" role="dialog" aria-modal="true" aria-label="고객센터 안내">
-    <h3>고객센터 안내</h3>
-    <p style="opacity:.8">아래 채널로 문의 주세요. (24/7 대응)</p>
-    <div class="support-list">
-      <div class="support-row"><strong>카카오톡</strong><code id="kakaoCopy">bi747</code></div>
-      <div class="support-row"><strong>텔레그램</strong><code id="tgCopy">@ADEN_CS</code></div>
+  <!-- 프로모션참여 (중/하위 카테고리 4개) -->
+  <dialog id="joinModal" class="modal">
+    <div class="body">
+      <button class="close" data-close>×</button>
+      <div class="bars">
+        <button class="bar mid" id="midBar">프로모션참여 카테고리</button>
+        <div id="subBars" class="subs">
+          <button class="bar sub" data-key="j1">30% 즉시보너스 신청</button>
+          <button class="bar sub" data-key="j2">프리스핀 100%보너스참여</button>
+          <button class="bar sub" data-key="j3">프리스핀 100%보너스당첨</button>
+          <button class="bar sub" data-key="j4">300배이상 보너스당첨</button>
+        </div>
+      </div>
+      <div id="joinDetail" class="detail">좌측에서 선택하세요.</div>
     </div>
-    <div class="support-actions">
-      <button id="openTG" class="btn-ghost">텔레 열기</button>
-      <button id="copyAll" class="btn-ghost">복사</button>
-      <button id="supportClose" class="btn-primary">닫기</button>
-    </div>
-  </div>
-</div>
+  </dialog>
 
-<script>
-/* ---------- 유틸: 소스 폴백 재생 ---------- */
-function playWithFallback(videoEl, sources, {loop=true, muted=true}={}){
-  videoEl.loop = loop;
-  videoEl.muted = muted;
-  let i = 0;
-  function tryNext(){
-    if(i >= sources.length){ console.warn('no playable src', sources); return; }
-    const src = sources[i++];
-    videoEl.src = src;
-    videoEl.load();
-    const onCan = ()=>{ videoEl.play().catch(()=>{}); cleanup(); };
-    const onErr = ()=>{ cleanup(); tryNext(); };
-    function cleanup(){ videoEl.removeEventListener('canplay', onCan); videoEl.removeEventListener('error', onErr); }
-    videoEl.addEventListener('canplay', onCan, {once:true});
-    videoEl.addEventListener('error', onErr, {once:true});
-  }
-  tryNext();
-}
+  <!-- 전체화면 비디오 오버레이 -->
+  <div id="overlay" class="overlay" hidden></div>
 
-/* ---------- 요소 ---------- */
-const bg = document.getElementById('bg');
-const bgVid = document.getElementById('bgVid');
-const monitor = document.getElementById('monitor');
-const centerVid = document.getElementById('centerVid');
-const promo = document.getElementById('promo');
-const promoImg = document.getElementById('promoImg');
-const actions = document.getElementById('actions');
-const bodyEl = document.body;
+  <script src="./js/app.js"></script>
+<link rel="stylesheet" href="./css/header-and-dock.css">
+<script src="./js/header-and-dock.js"></script>
 
-/* 시작: 중앙 모니터만 재생 (영문/한글 파일명 폴백) */
-playWithFallback(centerVid, ['assets/center.mp4','assets/센터.mp4'], {loop:true, muted:true});
+<link rel="stylesheet" href="./css/join-v2.css">
+<script src="./js/join-v2.js"></script>
 
-/* 혹시 레이아웃에 예전 버튼이 남아 있으면 6개만 강제 유지 */
-while(actions.children.length > 6){ actions.lastElementChild.remove(); }
+<link rel="stylesheet" href="./css/overlay-confine.css">
+<script src="./js/video-local-overlay.js"></script>
+<script src="./js/no-alert-signup.js"></script>
 
-/* 버튼 시각 반응 + 자동재생 언락 */
-document.querySelectorAll('.btn').forEach(b=>{
-  b.addEventListener('mousedown', ()=> b.classList.add('trans','neon'));
-  b.addEventListener('mouseup', ()=> setTimeout(()=>b.classList.remove('trans','neon'),180));
-});
-function unlockMedia(){
-  try{ centerVid.muted = true; centerVid.play().catch(()=>{});}catch(e){}
-  try{ bgVid.muted = true; }catch(e){}
-  window.removeEventListener('pointerdown', unlockMedia);
-  window.removeEventListener('touchstart', unlockMedia, {passive:true});
-  window.removeEventListener('click', unlockMedia);
-}
-window.addEventListener('pointerdown', unlockMedia, {once:true});
-window.addEventListener('touchstart', unlockMedia, {once:true, passive:true});
-window.addEventListener('click', unlockMedia, {once:true});
+<link rel="stylesheet" href="./css/glossy-bg.css">
+<script src="./js/ui-visibility.js"></script>
 
-/* ----------- 모니터 확대(프로모션용) ----------- */
-/* 목표 폭(px): 33.88cm ≈ 13.34inch * 96ppi ≈ 1281px → 기본 1280px로 설정하되
-   뷰포트 제한(가로 96vw, 세로 90vh)에서 안전하게 줄임 */
-function calcZoomScale(targetPx=1280){
-  const rect = monitor.getBoundingClientRect();
-  const vw = Math.max(document.documentElement.clientWidth, window.innerWidth||0);
-  const vh = Math.max(document.documentElement.clientHeight, window.innerHeight||0);
-  const maxByWidth = 0.96*vw / rect.width;
-  const maxByHeight = (0.90*vh) / rect.height;
-  const byTarget = targetPx / rect.width;
-  const scale = Math.min(maxByWidth, maxByHeight, byTarget);
-  return Math.max(1, scale);
-}
-function zoomMonitor(on){
-  if(on){
-    const scale = calcZoomScale(1280); // ≈ 33.88cm 물리 폭 추정
-    monitor.style.setProperty('--zoom', scale);
-    monitor.classList.add('zoom');
-    bodyEl.classList.add('zoom-lock');
-  }else{
-    monitor.classList.remove('zoom');
-    bodyEl.classList.remove('zoom-lock');
-    monitor.style.removeProperty('--zoom');
-  }
-}
-window.addEventListener('resize', ()=>{
-  if(monitor.classList.contains('zoom')){
-    const scale = calcZoomScale(1280);
-    monitor.style.setProperty('--zoom', scale);
-  }
-});
-
-/* 배경<->중앙 교차 재생 (안티페이즈 + canplay 이후 시작) */
-function crossPlay(srcArray, opts){
-  const { duration=6000, untilEnd=false } = (opts||{});
-
-  // 배경 준비
-  playWithFallback(bgVid, srcArray, {loop:!untilEnd, muted:true});
-  try{ bgVid.currentTime = 0; }catch(e){}
-
-  // 중앙은 계속 재생(일시정지하지 않음). 화면만 토글로 검정/표시.
-  let started = false;
-  let tm = null;
-  const step = 120;
-  let i = 0;
-
-  function tick(){
-    const centerOn = (i % 2 === 0);
-    if(centerOn){
-      monitor.classList.remove('monitor--off'); // 중앙 표시
-      bg.classList.remove('on');                // 배경 숨김(검정)
-    }else{
-      monitor.classList.add('monitor--off');    // 중앙 검정
-      bg.classList.add('on');                   // 배경 표시
-    }
-    i += 1;
-  }
-
-  function startSequence(){
-    if(started) return;
-    started = True
-    // 재생 시도
-    try{ bgVid.play().catch(()=>{}); }catch(e){}
-    // 첫 틱 즉시
-    tick();
-    tm = setInterval(tick, step);
-
-    function finish(){
-      if(tm){ clearInterval(tm); tm=null; }
-      // 원복
-      bgVid.pause();
-      bg.classList.remove('on');
-      monitor.classList.remove('monitor--off');
-      try{ centerVid.currentTime = 0; }catch(e){}
-      centerVid.play().catch(()=>{});
-    }
-
-    if(untilEnd){
-      const onEnded = ()=>{ bgVid.removeEventListener('ended', onEnded); finish(); };
-      bgVid.addEventListener('ended', onEnded);
-    }else{
-      setTimeout(finish, duration);
-    }
-  }
-
-  // canplay 이후 시작 → 실제 프레임이 준비된 뒤 교차
-  const onCan = ()=>{ bgVid.removeEventListener('canplay', onCan); startSequence(); };
-  bgVid.addEventListener('canplay', onCan);
-
-  // 안전장치: 800ms 내에 canplay가 안 오면 그냥 시작
-  setTimeout(()=>{ if(!started) startSequence(); }, 800);
-}
-
-/* 쿠폰/긴급 트리거 */
-document.getElementById('bCoupon').onclick = ()=> crossPlay(['assets/coupon-bg.mp4','assets/쿠폰-bg.mp4'], {duration:6000, untilEnd:false});
-document.getElementById('bEmergency').onclick = ()=> crossPlay(['assets/emergency-bg.mp4'], {untilEnd:true});
-
-/* 프로모션: 모니터 off → 확대 → 배너 슬라이드 → 다시 클릭 시 축소 복귀 */
-const promoList = ['assets/PRO1.png','assets/PRO2.png','assets/PRO3.png'];
-let pIdx=0, pTimer=null;
-function showPromo(){
-  // 1) 모니터 전원 off 효과
-  centerVid.pause();
-  monitor.classList.add('monitor--off');
-  // 2) 확대(부드럽게)
-  zoomMonitor(true);
-  // 3) 살짝 지연 후 슬라이드 on
-  setTimeout(()=>{
-    promo.classList.add('onfx'); promo.classList.add('on');
-    const render = ()=>{ promoImg.src = promoList[pIdx%promoList.length]; pIdx++; };
-    render(); pTimer = setInterval(render, 5000);
-  }, 380);
-}
-function hidePromo(){
-  clearInterval(pTimer);
-  promo.classList.add('off');
-  setTimeout(()=>{
-    promo.classList.remove('off','on','onfx');
-    zoomMonitor(false);
-    monitor.classList.remove('monitor--off');
-    centerVid.play().catch(()=>{});
-  }, 360);
-}
-document.getElementById('bPromo').onclick = ()=> promo.classList.contains('on') ? hidePromo() : showPromo();
-promo.onclick = ()=>{ // 살짝 확대 연출
-  promoImg.style.transition='transform .25s ease, filter .25s ease';
-  promoImg.style.transform='scale(1.08)'; promoImg.style.filter='drop-shadow(0 20px 40px rgba(69,243,255,.45))';
-  setTimeout(()=>{ promoImg.style.transform=''; promoImg.style.filter=''; },250);
-};
-
-/* 가입/설문 모달 */
-const mJoin = document.getElementById('mJoin');
-const mSurvey = document.getElementById('mSurvey');
-document.getElementById('bJoin').onclick = ()=> mJoin.classList.add('on');
-document.getElementById('xJoin').onclick = ()=> mJoin.classList.remove('on');
-document.getElementById('goSurvey').onclick = ()=>{ mJoin.classList.remove('on'); mSurvey.classList.add('on'); };
-document.getElementById('backJoin').onclick = ()=>{ mSurvey.classList.remove('on'); mJoin.classList.add('on'); };
-document.getElementById('okSubmit').onclick = ()=>{ mSurvey.classList.remove('on'); alert('제출 완료! 담당자가 확인 후 안내 드립니다.'); };
-
-/* 참여/문의 자리표시 */
-document.getElementById('bParticipate').onclick = ()=> alert('참여: 준비중');
-
-/* Support Modal */
-document.querySelectorAll('.js-support').forEach(el=> el.addEventListener('click', openSupport));
-const supportModal = document.getElementById('supportModal');
-const supportClose = document.getElementById('supportClose');
-const copyAllBtn = document.getElementById('copyAll');
-const openTG = document.getElementById('openTG');
-function openSupport(){ supportModal.classList.add('show'); supportModal.setAttribute('aria-hidden','false'); }
-function closeSupport(){ supportModal.classList.remove('show'); supportModal.setAttribute('aria-hidden','true'); }
-supportClose.addEventListener('click', closeSupport);
-supportModal.addEventListener('click', (e)=>{ if(e.target === supportModal) closeSupport(); });
-window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeSupport(); });
-copyAllBtn.addEventListener('click', async ()=>{
-  const txt = `카카오톡: bi747\n텔레그램: @ADEN_CS`;
-  try{ await navigator.clipboard.writeText(txt); copyAllBtn.textContent = '복사 완료!'; setTimeout(()=> copyAllBtn.textContent='복사', 1200); }catch(err){ alert('복사 실패. 수동 복사해주세요.'); }
-});
-openTG.addEventListener('click', ()=>{ window.open('https://t.me/ADEN_CS','_blank','noopener'); });
-</script>
 </body>
 </html>
