@@ -72,7 +72,7 @@ function stopZig(){ if(zigTimer){ clearInterval(zigTimer); zigTimer=null; } el('
 function makeSources(bases){ const exts=['.mp4','.MP4']; const list=[]; bases.forEach(b=> exts.forEach(e=> list.push(`./assets/${b}${e}`))); list.push('./assets/ddd1.mp4','./assets/DDD1.MP4'); return list; }
 function syncAspect(video){ const mon=el('#monitor'); if(video.videoWidth&&video.videoHeight){ mon.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`; } }
 
-// ▶ 기존 playZigzag 전체를 이 블록으로 교체
+
 async function playZigzag(srcList, interval = 200) {
   stopZig();
 
@@ -80,86 +80,72 @@ async function playZigzag(srcList, interval = 200) {
   const A = el('#layerA');
   const overlay = el('#overlay');
 
-  // A의 기존 내용을 저장해뒀다가 재생 종료 후 복구
+  // Save previous content to restore after end
   const prevA = A.innerHTML;
   A.innerHTML = '';
 
-  // 모니터가 오버레이보다 위에 오도록 (모니터 모드에서 배경은 검정 유지)
+  // ensure monitor above overlay when masking
   monitor.style.zIndex = '200';
 
-  // 오버레이는 재생 내내 표시(배경을 항상 검정으로 유지)
+  // overlay always on during playback to keep background black
   overlay.style.display = 'block';
   overlay.classList.remove('bgVideo');
-  overlay.classList.add('mask');   // 모니터 아래에 깔리는 검정 마스크
+  overlay.classList.add('mask');   // black mask under monitor
   overlay.innerHTML = '';
 
-  // 모니터/배경용 비디오 2개를 동시에 로드
+  // two videos (monitor & background)
   const vMon = document.createElement('video');
   const vBg  = document.createElement('video');
   [vMon, vBg].forEach(v => {
     Object.assign(v, { playsInline: true, muted: true, autoplay: true, controls: false, preload: 'auto' });
-    v.setAttribute('playsinline', '');
+    v.setAttribute('playsinline','');
   });
+  Object.assign(vMon.style, { width:'100%', height:'100%', objectFit:'contain', background:'#000' });
+  Object.assign(vBg.style,  { position:'absolute', inset:'0', width:'100%', height:'100%', objectFit:'contain', background:'#000' });
 
-  // 스타일
-  Object.assign(vMon.style, { width: '100%', height: '100%', objectFit: 'contain', background: '#000' });
-  Object.assign(vBg.style,  { position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', background: '#000' });
-
-  // DOM 배치
   A.appendChild(vMon);
-  overlay.appendChild(vBg); // 배경용 비디오는 오버레이 안에 유지
+  overlay.appendChild(vBg);
 
-  // 후보 소스 로테이션
+  // try candidate sources
   let i = 0;
   const tryNext = () => {
     if (i >= srcList.length) { cleanup(); return; }
     const src = srcList[i++] + '?t=' + Date.now();
-    vMon.src = src;
-    vBg.src  = src;
+    vMon.src = src; vBg.src = src;
   };
 
-  // 자동재생 보정
   let userGestureArmed = false;
   const ensurePlay = () => {
-    vMon.play().catch(() => {});
-    vBg.play().catch(() => {});
+    vMon.play().catch(()=>{});
+    vBg.play().catch(()=>{});
     if (!userGestureArmed) {
       monitor.addEventListener('click', () => { vMon.play().catch(()=>{}); vBg.play().catch(()=>{}); }, { once: true });
       userGestureArmed = true;
     }
   };
 
-  // 비율 동기(모니터 프레임)
   vMon.onloadedmetadata = () => syncAspect(vMon);
 
-  // 둘 다 재생 가능 상태가 되면 토글 시작
   let ready = 0, inMonitor = true, syncTimer = null, toggleTimer = null;
-
   const begin = () => {
     if (++ready < 2) return;
-
-    // 시작
     ensurePlay();
-
-    // 드리프트 보정(두 영상 시간차 최소화)
+    // drift correction
     syncTimer = setInterval(() => {
       if (Math.abs(vMon.currentTime - vBg.currentTime) > 0.06) {
         try { vBg.currentTime = vMon.currentTime; } catch(e) {}
       }
     }, 80);
-
-    // 0.2초 간격 토글
+    // 0.2s toggle
     toggleTimer = setInterval(() => {
       inMonitor = !inMonitor;
       if (inMonitor) {
-        // **모니터 모드**: 배경은 ‘검정’만, 배경영상 숨김
         overlay.classList.remove('bgVideo');
-        overlay.classList.add('mask');   // z-index 낮게, 검정만 유지
+        overlay.classList.add('mask');   // keep black
         vBg.style.display = 'none';
       } else {
-        // **배경 모드**: 오버레이가 앞으로 올라와 전체화면 영상
         overlay.classList.remove('mask');
-        overlay.classList.add('bgVideo'); // z-index 크게
+        overlay.classList.add('bgVideo'); // fullscreen bg video
         vBg.style.display = 'block';
       }
     }, interval);
@@ -168,11 +154,21 @@ async function playZigzag(srcList, interval = 200) {
   vMon.oncanplay = begin;
   vBg.oncanplay  = begin;
 
-  // 공통 정리
   const cleanup = () => {
-    if (syncTimer)  clearInterval(syncTimer);
-    if (toggleTimer) cl
+    if (syncTimer) clearInterval(syncTimer);
+    if (toggleTimer) clearInterval(toggleTimer);
+    overlay.classList.remove('bgVideo','mask');
+    overlay.style.display = 'none';
+    overlay.innerHTML = '';
+    [vMon, vBg].forEach(v => { try{ v.pause(); }catch(e){} v.src=''; v.remove(); });
+    monitor.style.zIndex = '';
+    A.innerHTML = prevA; // restore monitor content
+  };
 
+  vMon.onerror = vBg.onerror = () => { cleanup(); tryNext(); };
+  vMon.onended = vBg.onended = () => cleanup();
+
+  tryNext();
 }
 
 /* close modals */
