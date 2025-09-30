@@ -39,3 +39,5 @@
 .bar.mid{font-weight:800}.subs{max-height:0;overflow:hidden;opacity:.0;transition:max-height .24s ease, opacity .24s ease}
 .subs.open{max-height:500px;opacity:1}
 .detail{margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
+
+#layerA video{width:100%;height:100%;object-fit:contain;background:#000}

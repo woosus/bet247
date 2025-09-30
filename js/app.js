@@ -91,35 +91,89 @@ function makeSources(bases){
 }
 function syncAspect(video){ const mon=el('#monitor'); if(video.videoWidth&&video.videoHeight){ mon.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`; } }
 
+
 async function playZigzag(srcList, interval=200){
   stopZig();
-  const A=el('#layerA'); const overlay=el('#overlay');
+  const A = el('#layerA');
+  const overlay = el('#overlay');
   A.innerHTML='';
-  const video=document.createElement('video');
-  Object.assign(video,{playsInline:true,controls:false,muted:true,autoplay:true,preload:'auto'});
-  video.style.width='100%'; video.style.height='100%'; video.style.objectFit='contain';
+
+  // Create two video elements (monitor & overlay) and keep them in sync
+  const vMon = document.createElement('video');
+  const vBg  = document.createElement('video');
+  [vMon, vBg].forEach(v => {
+    Object.assign(v, {playsInline:true, muted:true, autoplay:true, controls:false, preload:'auto'});
+    v.setAttribute('playsinline','');
+  });
+  vMon.style.width='100%'; vMon.style.height='100%'; vMon.style.objectFit='contain';
+  vBg.style.position='absolute'; vBg.style.inset='0'; vBg.style.width='100%'; vBg.style.height='100%'; vBg.style.objectFit='contain'; vBg.style.background='#000';
+
+  A.appendChild(vMon);
+  overlay.innerHTML=''; overlay.appendChild(vBg);
 
   let i=0;
   const tryNext=()=>{
-    if(i>=srcList.length){ A.textContent='영상 파일을 찾지 못했습니다.'; return; }
+    if(i>=srcList.length){
+      A.textContent='영상 파일을 찾지 못했습니다.';
+      overlay.classList.remove('show'); overlay.setAttribute('hidden','');
+      return;
+    }
     const src = srcList[i++] + '?t='+Date.now();
-    video.src=src;
-    let errored=false;
-    video.onerror=()=>{ if(!errored){ errored=true; tryNext(); } };
-    video.onloadedmetadata=()=> syncAspect(video);
-    video.onloadeddata=()=>{
-      A.appendChild(video);
-      let inMonitor=true;
-      zigTimer=setInterval(()=>{
-        inMonitor=!inMonitor;
-        if(inMonitor){ overlay.classList.remove('show'); overlay.setAttribute('hidden',''); A.appendChild(video); }
-        else { overlay.innerHTML=''; overlay.appendChild(video); overlay.removeAttribute('hidden'); overlay.classList.add('show'); }
-      }, interval);
-      const playNow=()=> video.play().catch(()=>{});
-      playNow(); el('#monitor').addEventListener('click', playNow, {once:true});
-    };
-    video.onended=()=> stopZig();
+    vMon.src = src; vBg.src = src;
   };
+
+  let syncTimer=null, toggleTimer=null, inMonitor=true, userGestureDone=false;
+
+  const startPlay = ()=>{
+    // Try to play both; some browsers need user gesture for at least one
+    const p1 = vMon.play().catch(()=>{});
+    const p2 = vBg.play().catch(()=>{});
+    Promise.allSettled([p1,p2]).then(()=>{
+      if(!userGestureDone){
+        // If autoplay was blocked, click on monitor to proceed
+        el('#monitor').addEventListener('click', ()=>{
+          vMon.play().catch(()=>{});
+          vBg.play().catch(()=>{});
+        }, {once:true});
+        userGestureDone=true;
+      }
+    });
+  };
+
+  vMon.onloadedmetadata = ()=> syncAspect(vMon);
+  vBg.onloadedmetadata  = ()=> {/* no-op */};
+
+  vMon.oncanplay = vBg.oncanplay = ()=>{
+    // Begin toggling when both ready
+    overlay.removeAttribute('hidden');
+    overlay.classList.add('show');
+    startPlay();
+    // Keep currentTime close (drift correction)
+    syncTimer = setInterval(()=>{
+      if (Math.abs(vMon.currentTime - vBg.currentTime) > 0.08){
+        try { vBg.currentTime = vMon.currentTime; } catch(e){}
+      }
+    }, 80);
+    toggleTimer = setInterval(()=>{
+      inMonitor = !inMonitor;
+      if(inMonitor){
+        overlay.classList.remove('show'); overlay.setAttribute('hidden','');
+      }else{
+        overlay.removeAttribute('hidden'); overlay.classList.add('show');
+      }
+    }, interval);
+  };
+
+  const cleanup = ()=>{
+    if(syncTimer) clearInterval(syncTimer);
+    if(toggleTimer) clearInterval(toggleTimer);
+    overlay.classList.remove('show'); overlay.setAttribute('hidden','');
+    [vMon, vBg].forEach(v=>{ v.pause(); v.src=''; });
+  };
+
+  vMon.onerror = vBg.onerror = ()=>{ cleanup(); tryNext(); };
+  vMon.onended = vBg.onended = ()=> cleanup();
+
   tryNext();
 }
 
