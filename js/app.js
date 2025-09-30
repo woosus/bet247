@@ -69,7 +69,26 @@ els('.bar.sub', el('#subBars')).forEach(b=> b.addEventListener('click', ()=>{
 /* ====== Video ZigZag (0.2s monitor ↔ full overlay) ====== */
 let zigTimer=null;
 function stopZig(){ if(zigTimer){ clearInterval(zigTimer); zigTimer=null; } el('#overlay').classList.remove('show'); }
-function makeSources(bases){ const exts=['.mp4','.MP4']; const list=[]; bases.forEach(b=> exts.forEach(e=> list.push(`./assets/${b}${e}`))); list.push('./assets/ddd1.mp4','./assets/DDD1.MP4'); return list; }
+
+function makeSources(bases){
+  // Build robust candidate list: ./assets/<base>.mp4 (Korean/English, lower/upper)
+  const list = [];
+  const uniq = new Set();
+  const push = (s)=>{ if(!uniq.has(s)) { uniq.add(s); list.push(s); } };
+  const exts = ['.mp4', '.MP4'];
+  const alts = [];
+  bases.forEach(b=>{
+    alts.push(b, b.toLowerCase(), b.toUpperCase());
+  });
+  // Add concrete known names
+  alts.push('쿠폰신청','긴급쿠폰신청','coupon','emergency');
+  for(const a of alts){
+    for(const e of exts){
+      push(`./assets/${a}${e}`);
+    }
+  }
+  return Array.from(list);
+}
 function syncAspect(video){ const mon=el('#monitor'); if(video.videoWidth&&video.videoHeight){ mon.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`; } }
 
 async function playZigzag(srcList, interval=200){
@@ -77,7 +96,7 @@ async function playZigzag(srcList, interval=200){
   const A=el('#layerA'); const overlay=el('#overlay');
   A.innerHTML='';
   const video=document.createElement('video');
-  Object.assign(video,{playsInline:true,controls:false,muted:true,autoplay:true});
+  Object.assign(video,{playsInline:true,controls:false,muted:true,autoplay:true,preload:'auto'});
   video.style.width='100%'; video.style.height='100%'; video.style.objectFit='contain';
 
   let i=0;
@@ -93,8 +112,8 @@ async function playZigzag(srcList, interval=200){
       let inMonitor=true;
       zigTimer=setInterval(()=>{
         inMonitor=!inMonitor;
-        if(inMonitor){ overlay.classList.remove('show'); A.appendChild(video); }
-        else { overlay.innerHTML=''; overlay.appendChild(video); overlay.classList.add('show'); }
+        if(inMonitor){ overlay.classList.remove('show'); overlay.setAttribute('hidden',''); A.appendChild(video); }
+        else { overlay.innerHTML=''; overlay.appendChild(video); overlay.removeAttribute('hidden'); overlay.classList.add('show'); }
       }, interval);
       const playNow=()=> video.play().catch(()=>{});
       playNow(); el('#monitor').addEventListener('click', playNow, {once:true});
